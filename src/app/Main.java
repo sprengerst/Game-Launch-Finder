@@ -16,7 +16,6 @@ import java.util.Arrays;
 public class Main extends Application {
 
     private static final String DIRECTORY_PATH = "E:\\VR-Part";
-
     private static final ArrayList<String> ignoreNames = new ArrayList<>(Arrays.asList("LAUNCHER", "LAUNCHER_x64", "UnityCrashHandler64"));
 
     @Override
@@ -26,45 +25,53 @@ public class Main extends Application {
 
         File[] files = new File(DIRECTORY_PATH).listFiles();
 
-        for (File subDir : files) {
-            File[] subFiles = subDir.listFiles();
-            System.out.println("Check subDir: " + subDir);
+        if (files == null) {
+            // TODO error handling
+        } else {
 
-            if (subDir.isDirectory()) {
-                boolean exeFound = false;
-                for (File subFile : subFiles) {
-                    if(!subFile.isDirectory()) {
-                        String extension = FilenameUtils.getExtension(subFile.getAbsolutePath());
-                        String filename = FilenameUtils.removeExtension(subFile.getName());
+            for (File subDir : files) {
+                File[] subFiles = subDir.listFiles();
+                System.out.println("Check subDir: " + subDir);
 
-                        System.out.println("Check: " + filename + " . " + extension);
+                if (subDir.isDirectory()) {
+                    boolean exeFound = false;
+                    if (subFiles == null) {
+                        // TODO error handling
+                    } else {
+                        for (File subFile : subFiles) {
+                            if (!subFile.isDirectory()) {
+                                String extension = FilenameUtils.getExtension(subFile.getAbsolutePath());
+                                String filename = FilenameUtils.removeExtension(subFile.getName());
 
-                        if (extension.equals("exe") && !ignoreNames.contains(filename)) {
-                            exeFound = true;
-                            System.out.println("FOUND EXE: " + filename);
-                            gameList.add(new Game(subFile.getAbsolutePath(), filename));
+                                System.out.println("Check: " + filename + " . " + extension);
+
+                                if (extension.equals("exe") && !ignoreNames.contains(filename)) {
+                                    exeFound = true;
+                                    System.out.println("FOUND EXE: " + filename);
+                                    gameList.add(new Game(subFile.getAbsolutePath(), filename));
+                                }
+                            }
                         }
-                    }
-                }
 
-                if (!exeFound) {
+                        if (!exeFound) {
+                            // checking subdir
+                            for (File subFile : subFiles) {
+                                if (subFile.isDirectory()) {
 
-                    // checking subdir
-                    for (File subFile : subFiles) {
-                        if(subFile.isDirectory()) {
+                                    File[] subSubFiles = subFile.listFiles();
 
-                            File[] subSubFiles = subFile.listFiles();
+                                    for (File subSubFile : subSubFiles) {
+                                        if (!subSubFile.isDirectory()) {
+                                            String extension = FilenameUtils.getExtension(subSubFile.getAbsolutePath());
+                                            String filename = FilenameUtils.removeExtension(subSubFile.getName());
 
-                            for (File subSubFile : subSubFiles) {
-                                if(!subSubFile.isDirectory()) {
-                                    String extension = FilenameUtils.getExtension(subSubFile.getAbsolutePath());
-                                    String filename = FilenameUtils.removeExtension(subSubFile.getName());
+                                            System.out.println("Check: " + filename + " . " + extension);
 
-                                    System.out.println("Check: " + filename + " . " + extension);
-
-                                    if (extension.equals("exe") && !ignoreNames.contains(filename)) {
-                                        System.out.println("FOUND EXE: " + filename);
-                                        gameList.add(new Game(subFile.getAbsolutePath(), filename));
+                                            if (extension.equals("exe") && !ignoreNames.contains(filename)) {
+                                                System.out.println("FOUND EXE: " + filename);
+                                                gameList.add(new Game(subSubFile.getAbsolutePath(), filename));
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -73,7 +80,6 @@ public class Main extends Application {
                 }
             }
         }
-
         ListView<Game> lv = new ListView<>(gameList);
         lv.setCellFactory(param -> new XCell());
 

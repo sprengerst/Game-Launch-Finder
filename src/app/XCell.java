@@ -7,6 +7,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 
+import java.io.IOException;
+
 public class XCell extends ListCell<Game> {
     private HBox hbox = new HBox();
     private Label label = new Label("(empty)");
@@ -18,7 +20,13 @@ public class XCell extends ListCell<Game> {
         super();
         hbox.getChildren().addAll(label, pane, button);
         HBox.setHgrow(pane, Priority.ALWAYS);
-        button.setOnAction(event -> System.out.println(lastItem + " : " + event));
+        button.setOnAction(event -> {
+            try {
+                Utility.runExeWithAdmin(lastItem.getPath());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
     }
 
 
